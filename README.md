@@ -52,6 +52,12 @@ bun run start
     source's last-modified header and skips the download if nothing has changed.
   - **Atomic swap.** New data replaces the old in one transaction. If a download fails, the last good
     copy keeps being served.
+  - **Keys and duplicates.** Establishments are keyed by the state's `nys_health_operation_id`. A few
+    establishments appear in more than one source row; each sync merges them into one:
+    - Exact copies collapse into one.
+    - Otherwise the latest inspection wins.
+    - Rows with the same inspection date but different results are combined: the higher totals and
+      every distinct violation and note. Each of these combines is logged as a warning.
 - **Viewport search.** On every pan or zoom the client asks
   `/api/establishments?bbox=…&zoom=…`.
   - Up to 800 establishments come back as points. Above that, the server groups them into a grid of

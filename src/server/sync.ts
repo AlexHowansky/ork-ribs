@@ -11,7 +11,7 @@ import { parseViolations } from "./violations.ts";
 export const DATASET_URL = "https://health.data.ny.gov/resource/cnih-y5dw.json";
 
 const FIELDS = [
-  ":id",
+  "nys_health_operation_id",
   "facility",
   "operation_name",
   "facility_address",
@@ -26,7 +26,6 @@ const FIELDS = [
   "violations",
   "inspection_comments",
   "location1",
-  "nys_health_operation_id",
 ];
 
 const PAGE_SIZE = 10_000;
@@ -34,7 +33,6 @@ const REQUEST_TIMEOUT_MS = 60_000;
 const MAX_ATTEMPTS = 3;
 
 export interface SourceRow {
-  ":id"?: string;
   facility?: string;
   operation_name?: string;
   facility_address?: string;
@@ -66,6 +64,8 @@ export interface SyncResult {
   status: "updated" | "unchanged";
   rows: number;
   skipped: number;
+  /** Establishments that appeared in more than one source row and were merged into one. */
+  merged: number;
   durationMs: number;
 }
 
@@ -93,18 +93,17 @@ const count = (s: string | undefined): number => {
 
 /** Convert one API row into our shape, or return null if it can't be placed on the map. */
 export function toEstablishment(r: SourceRow): NewEstablishment | null {
-  const id = r[":id"];
+  const id = r.nys_health_operation_id?.trim();
   const name = clean(r.facility) ?? clean(r.operation_name);
   const lat = Number(r.location1?.latitude);
   const lng = Number(r.location1?.longitude);
-  if (!id || !name || !Number.isFinite(lat) || !Number.isFinite(lng)) return null;
+  if (!id || !/^\d{1,12}$/.test(id) || !name || !Number.isFinite(lat) || !Number.isFinite(lng)) return null;
   if (lat < NY_BOUNDS.south || lat > NY_BOUNDS.north || lng < NY_BOUNDS.west || lng > NY_BOUNDS.east) return null;
 
   const date = r.date && !Number.isNaN(Date.parse(r.date)) ? r.date.slice(0, 10) : null;
 
   return {
     id,
-    operation_id: clean(r.nys_health_operation_id),
     name,
     address: clean(r.facility_address) ?? "",
     city: clean(r.city),
@@ -120,6 +119,83 @@ export function toEstablishment(r: SourceRow): NewEstablishment | null {
     lng,
     violations: parseViolations(r.violations && repairText(r.violations)),
   };
+}
+
+export interface MergeReport {
+  id: string;
+  rows: number;
+  /** "identical": exact copies; "latest": kept the most recent inspection; "combined": same date, results merged. */
+  resolution: "identical" | "latest" | "combined";
+}
+
+function union<T>(lists: T[][], key: (t: T) => string): T[] {
+  const seen = new Set<string>();
+  const out: T[] = [];
+  for (const list of lists) {
+    for (const item of list) {
+      const k = key(item);
+      if (!seen.has(k)) {
+        seen.add(k);
+        out.push(item);
+      }
+    }
+  }
+  return out;
+}
+
+/**
+ * The dataset occasionally lists one establishment (one NYS Health operation id)
+ * in more than one row. Collapse each group into a single establishment:
+ * exact copies become one; otherwise the most recent inspection wins; and when
+ * the rows describe the same inspection date differently, their results are
+ * combined — the higher totals and every distinct violation and note — so
+ * nothing the state published is hidden.
+ */
+export function mergeDuplicates(rows: NewEstablishment[]): { rows: NewEstablishment[]; merges: MergeReport[] } {
+  const groups = new Map<string, NewEstablishment[]>();
+  for (const r of rows) {
+    const g = groups.get(r.id);
+    if (g) g.push(r);
+    else groups.set(r.id, [r]);
+  }
+
+  const out: NewEstablishment[] = [];
+  const merges: MergeReport[] = [];
+  for (const [id, group] of groups) {
+    if (group.length === 1) {
+      out.push(group[0]!);
+      continue;
+    }
+    if (new Set(group.map((r) => JSON.stringify(r))).size === 1) {
+      out.push(group[0]!);
+      merges.push({ id, rows: group.length, resolution: "identical" });
+      continue;
+    }
+    const latestDate = group.reduce<string | null>((max, r) => (r.inspection_date && (!max || r.inspection_date > max) ? r.inspection_date : max), null);
+    const latest = group.filter((r) => r.inspection_date === latestDate);
+    if (latest.length === 1) {
+      out.push(latest[0]!);
+      merges.push({ id, rows: group.length, resolution: "latest" });
+      continue;
+    }
+    const comments = union(
+      latest.map((r) => (r.comments ?? "").split("|").map((c) => c.trim()).filter(Boolean)),
+      (c) => c,
+    );
+    out.push({
+      ...latest[0]!,
+      critical_count: Math.max(...latest.map((r) => r.critical_count)),
+      noncritical_count: Math.max(...latest.map((r) => r.noncritical_count)),
+      crit_not_corrected: Math.max(...latest.map((r) => r.crit_not_corrected)),
+      comments: comments.length ? comments.join("|") : null,
+      violations: union(
+        latest.map((r) => r.violations),
+        (v) => `${v.code}|${v.critical}|${v.description}`,
+      ),
+    });
+    merges.push({ id, rows: group.length, resolution: "combined" });
+  }
+  return { rows: out, merges };
 }
 
 async function fetchWithRetry(url: string, init: RequestInit, doFetch: FetchLike, logger: Logger): Promise<Response> {
@@ -166,7 +242,7 @@ async function runSync(store: Store, opts: SyncOptions): Promise<SyncResult> {
   if (!opts.force && sourceModified && sourceModified === store.getMeta("source_last_modified") && store.count() > 0) {
     store.setMeta("last_checked_at", new Date().toISOString());
     logger.info("source unchanged; skipping download", { sourceModified });
-    return { status: "unchanged", rows: store.count(), skipped: 0, durationMs: Math.round(performance.now() - started) };
+    return { status: "unchanged", rows: store.count(), skipped: 0, merged: 0, durationMs: Math.round(performance.now() - started) };
   }
 
   logger.info("downloading dataset", { sourceModified });
@@ -175,7 +251,7 @@ async function runSync(store: Store, opts: SyncOptions): Promise<SyncResult> {
   for (let offset = 0; ; offset += PAGE_SIZE) {
     const params = new URLSearchParams({
       $select: FIELDS.join(","),
-      $order: ":id",
+      $order: ":id", // Socrata's row id, used only to page in a stable order
       $limit: String(PAGE_SIZE),
       $offset: String(offset),
     });
@@ -193,16 +269,23 @@ async function runSync(store: Store, opts: SyncOptions): Promise<SyncResult> {
 
   if (rows.length === 0) throw new Error("The NYS open data service returned no usable rows; keeping existing data");
 
+  const { rows: establishments, merges } = mergeDuplicates(rows);
+  for (const m of merges) {
+    // Conflicting copies of one establishment are worth reporting to the state; exact copies are just noise.
+    if (m.resolution === "combined") logger.warn("source lists conflicting results for one establishment; combined them", { ...m });
+    else logger.info("merged duplicate source rows", { ...m });
+  }
+
   const now = new Date().toISOString();
-  store.replaceAll(rows, {
+  store.replaceAll(establishments, {
     source_last_modified: sourceModified,
     last_synced_at: now,
     last_checked_at: now,
-    row_count: String(rows.length),
+    row_count: String(establishments.length),
   });
   const durationMs = Math.round(performance.now() - started);
-  logger.info("dataset synced", { rows: rows.length, skipped, durationMs });
-  return { status: "updated", rows: rows.length, skipped, durationMs };
+  logger.info("dataset synced", { rows: establishments.length, skipped, merged: merges.length, durationMs });
+  return { status: "updated", rows: establishments.length, skipped, merged: merges.length, durationMs };
 }
 
 /** Sync now if the local copy is empty or stale, then keep checking on an interval. */

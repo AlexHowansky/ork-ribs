@@ -30,9 +30,9 @@ export function parseZoom(raw: string | null): number {
   return z;
 }
 
-/** Establishment ids are Socrata row ids such as `row-abcd.ef12_3456`. */
+/** Establishment ids are NYS Health operation ids, which are numeric (e.g. `252181`). */
 export function parseEstablishmentId(raw: string | undefined): string {
-  if (!raw || !/^[A-Za-z0-9._~-]{1,64}$/.test(raw)) throw Errors.notFound("We couldn't find that establishment.");
+  if (!raw || !/^\d{1,12}$/.test(raw)) throw Errors.notFound("We couldn't find that establishment.");
   return raw;
 }
 

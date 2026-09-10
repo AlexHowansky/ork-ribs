@@ -45,10 +45,10 @@ describe("parseZoom", () => {
 });
 
 describe("parseEstablishmentId", () => {
-  test("accepts Socrata row ids", () => {
-    expect(parseEstablishmentId("row-9a2c_hizz~i8kj")).toBe("row-9a2c_hizz~i8kj");
+  test("accepts NYS Health operation ids", () => {
+    expect(parseEstablishmentId("252181")).toBe("252181");
   });
-  test.each([undefined, "", "../etc/passwd", "a b", "x'--", "a".repeat(65)])("rejects %p as not found", (raw) =>
+  test.each([undefined, "", "row-9a2c_hizz~i8kj", "../etc/passwd", "1 2", "1'--", "-5", "1".repeat(13)])("rejects %p as not found", (raw) =>
     rejects(() => parseEstablishmentId(raw), 404),
   );
 });

@@ -7,8 +7,7 @@ setLogLevel("error");
 
 function est(i: number, over: Partial<NewEstablishment> = {}): NewEstablishment {
   return {
-    id: `row-${i}`,
-    operation_id: String(i),
+    id: String(1000 + i),
     name: `PLACE ${i}`,
     address: `${i} MAIN STREET`,
     city: "ALBANY",
@@ -77,11 +76,11 @@ describe("GET /api/establishments", () => {
 
 describe("GET /api/establishments/:id", () => {
   test("returns details with violations and tidy notes", async () => {
-    const res = await get("/api/establishments/row-3");
+    const res = await get("/api/establishments/1003");
     expect(res.status).toBe(200);
     const body = (await res.json()) as Record<string, unknown>;
     expect(body).toMatchObject({
-      id: "row-3",
+      id: "1003",
       name: "PLACE 3",
       inspectionDate: "2026-08-07",
       critical: 1,
@@ -91,7 +90,7 @@ describe("GET /api/establishments/:id", () => {
   });
 
   test("unknown and malicious ids get a friendly 404", async () => {
-    for (const id of ["row-nope", "..%2F..%2Fetc%2Fpasswd", "x'%20OR%201=1--"]) {
+    for (const id of ["999999", "row-3", "..%2F..%2Fetc%2Fpasswd", "x'%20OR%201=1--"]) {
       const res = await get(`/api/establishments/${id}`);
       expect(res.status).toBe(404);
       const body = (await res.json()) as { error: { message: string } };

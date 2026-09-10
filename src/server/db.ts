@@ -5,8 +5,8 @@ import type { BBox } from "./validate.ts";
 import type { Violation } from "./violations.ts";
 
 export interface EstablishmentRow {
+  /** The state's NYS Health operation id for the establishment. */
   id: string;
-  operation_id: string | null;
   name: string;
   address: string;
   city: string | null;
@@ -53,8 +53,7 @@ export interface NewEstablishment extends EstablishmentRow {
 
 const MIGRATIONS: string[] = [
   `CREATE TABLE establishments (
-     id TEXT PRIMARY KEY,
-     operation_id TEXT,
+     id TEXT PRIMARY KEY, -- nys_health_operation_id
      name TEXT NOT NULL,
      address TEXT NOT NULL,
      city TEXT,
@@ -172,9 +171,9 @@ export class Store {
    */
   replaceAll(rows: NewEstablishment[], meta: Record<string, string>): void {
     const insertEst = this.db.query(
-      `INSERT INTO establishments (id, operation_id, name, address, city, zip, county, description, inspection_date,
+      `INSERT INTO establishments (id, name, address, city, zip, county, description, inspection_date,
          critical_count, noncritical_count, crit_not_corrected, comments, lat, lng)
-       VALUES ($id, $operation_id, $name, $address, $city, $zip, $county, $description, $inspection_date,
+       VALUES ($id, $name, $address, $city, $zip, $county, $description, $inspection_date,
          $critical_count, $noncritical_count, $crit_not_corrected, $comments, $lat, $lng)`,
     );
     const insertViolation = this.db.query(
