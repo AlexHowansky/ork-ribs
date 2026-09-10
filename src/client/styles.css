@@ -1,0 +1,28 @@
+@import "tailwindcss";
+@source "./";
+
+@plugin "daisyui" {
+  themes: winter --default, night --prefersdark;
+  /* Only the components this app uses (plus base and utility modules); the rest would add ~500 KB. */
+  include: properties, rootcolor, rootscrolllock, rootscrollgutter, scrollbar, svg, radius, join, typography,
+    alert, badge, button, link, loading, modal, navbar, skeleton, stat, toast;
+}
+
+/* Font Awesome inline SVGs (its own stylesheet is not loaded; this is the only rule we need). */
+.svg-inline--fa {
+  display: inline-block;
+  height: 1em;
+  overflow: visible;
+  vertical-align: -0.125em;
+}
+
+/* MapLibre's shift-drag zoom box, drawn in theme colours rather than the library's fixed ones. */
+.maplibregl-boxzoom {
+  background: color-mix(in oklab, var(--color-primary) 20%, transparent);
+  border: 2px dotted var(--color-primary);
+}
+
+/* Map markers sit on the map canvas; lift the one under the pointer or focus. */
+.maplibregl-marker:has(> :hover, > :focus-visible) {
+  z-index: 2;
+}

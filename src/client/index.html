@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Find New York State restaurants and food service establishments on a map, with their latest health inspection results." />
+    <meta name="color-scheme" content="light dark" />
+    <!-- src/server/build.ts injects the blocking theme-init.js script before the title. -->
+    <title>ORK Restaurant Guide</title>
+    <link rel="stylesheet" href="./styles.css" />
+    <script type="module" src="./main.ts"></script>
+  </head>
+  <body class="h-dvh overflow-hidden">
+    <a href="#map" class="sr-only focus:not-sr-only focus:absolute focus:left-2 focus:top-2 focus:z-50 btn btn-sm">Skip to map</a>
+
+    <div class="flex h-full flex-col">
+      <header class="navbar min-h-0 flex-wrap gap-x-4 gap-y-2 bg-base-200 px-4 py-2 shadow-sm">
+        <div class="flex flex-1 flex-wrap items-center justify-between gap-x-4 gap-y-2 sm:justify-start">
+          <h1 class="flex items-center gap-2 text-base font-bold sm:text-lg">
+            <span data-icon="utensils" class="text-primary"></span>
+            ORK Restaurant Guide
+          </h1>
+          <button id="locate-btn" type="button" class="btn btn-sm">
+            <span data-icon="location-crosshairs"></span>
+            <span>Locate me</span>
+          </button>
+        </div>
+        <div class="flex flex-wrap items-center gap-x-2 gap-y-2">
+          <div id="theme-control" class="join" role="group" aria-label="Colour theme"></div>
+          <button id="reset-btn" type="button" class="btn btn-sm btn-ghost">
+            <span data-icon="rotate-left"></span>
+            <span>Reset preferences</span>
+          </button>
+        </div>
+      </header>
+
+      <main class="relative flex-1">
+        <!-- MapLibre gives its container position: relative, so the map fills a positioned wrapper instead. -->
+        <div class="absolute inset-0">
+          <div id="map" class="size-full" role="region" aria-label="Map of food service establishments" tabindex="-1"></div>
+        </div>
+
+        <!-- Overlays, not navbar content: their text changes as the map moves and must never resize the map. -->
+        <div class="pointer-events-none absolute left-3 right-16 top-3 z-10 flex flex-col items-start gap-2">
+          <p id="status" class="pointer-events-auto flex items-center gap-2 rounded-box bg-base-100 px-3 py-1.5 text-sm shadow-md" role="status" aria-live="polite">
+            <span id="status-spinner" class="loading loading-spinner loading-xs" hidden aria-hidden="true"></span>
+            <span id="status-text">Loading map…</span>
+          </p>
+          <div id="notice" role="status" class="alert alert-info pointer-events-auto max-w-3xl shadow-md" hidden>
+            <span data-icon="circle-info"></span>
+            <span id="notice-text"></span>
+          </div>
+        </div>
+
+        <div class="absolute right-3 top-3 z-10 join join-vertical shadow-md">
+          <button id="zoom-in" type="button" class="btn btn-square btn-sm join-item" aria-label="Zoom in" title="Zoom in">
+            <span data-icon="plus"></span>
+          </button>
+          <button id="zoom-out" type="button" class="btn btn-square btn-sm join-item" aria-label="Zoom out" title="Zoom out">
+            <span data-icon="minus"></span>
+          </button>
+        </div>
+
+        <details id="legend" class="absolute bottom-10 left-3 z-10 rounded-box bg-base-100 text-xs shadow-md" open>
+          <summary class="cursor-pointer select-none px-3 py-2 font-semibold">Last inspection</summary>
+          <div class="px-3 pb-3">
+            <ul class="grid gap-1">
+              <li class="flex items-center gap-2"><span class="badge badge-sm badge-error px-1"><span data-icon="utensils"></span></span>Critical violations</li>
+              <li class="flex items-center gap-2"><span class="badge badge-sm badge-warning px-1"><span data-icon="utensils"></span></span>Non-critical violations only</li>
+              <li class="flex items-center gap-2"><span class="badge badge-sm badge-success px-1"><span data-icon="utensils"></span></span>No violations</li>
+              <li class="flex items-center gap-2"><span class="badge badge-sm badge-primary px-1">12</span>Group — select to zoom in</li>
+            </ul>
+          </div>
+        </details>
+
+        <p class="absolute bottom-0 right-0 z-10 max-w-full rounded-tl-box bg-base-100/90 px-2 py-1 text-xs text-base-content/80">
+          Map <a class="link" href="https://openfreemap.org" target="_blank" rel="noopener noreferrer">OpenFreeMap</a>
+          © <a class="link" href="https://www.openmaptiles.org/" target="_blank" rel="noopener noreferrer">OpenMapTiles</a>
+          Data from <a class="link" href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a>
+          · Inspections:
+          <a class="link" href="https://health.data.ny.gov/Health/Food-Service-Establishment-Last-Inspection/cnih-y5dw" target="_blank" rel="noopener noreferrer">NYS Dept. of Health</a><span id="data-updated"></span>
+        </p>
+      </main>
+    </div>
+
+    <div id="toasts" class="toast toast-top toast-end z-50" aria-live="polite"></div>
+
+    <dialog id="details-dialog" class="modal" aria-labelledby="details-title">
+      <div class="modal-box w-[calc(100vw-2rem)] max-w-none">
+        <form method="dialog">
+          <button class="btn btn-sm btn-circle btn-ghost absolute right-3 top-3" aria-label="Close details" title="Close">
+            <span data-icon="xmark"></span>
+          </button>
+        </form>
+        <div id="details-content"></div>
+      </div>
+      <form method="dialog" class="modal-backdrop"><button tabindex="-1">Close</button></form>
+    </dialog>
+
+    <dialog id="confirm-dialog" class="modal" aria-labelledby="confirm-title" aria-describedby="confirm-body">
+      <div class="modal-box">
+        <form method="dialog">
+          <button value="cancel" class="btn btn-sm btn-circle btn-ghost absolute right-3 top-3" aria-label="Close without resetting" title="Close">
+            <span data-icon="xmark"></span>
+          </button>
+        </form>
+        <h2 id="confirm-title" class="pr-10 text-lg font-bold"></h2>
+        <p id="confirm-body" class="py-4"></p>
+        <form method="dialog" class="modal-action">
+          <button value="cancel" class="btn" autofocus>Cancel</button>
+          <button value="confirm" id="confirm-action" class="btn btn-error"></button>
+        </form>
+      </div>
+      <form method="dialog" class="modal-backdrop"><button value="cancel" tabindex="-1">Close</button></form>
+    </dialog>
+  </body>
+</html>
