@@ -1,5 +1,6 @@
 import { LngLatBounds, Marker, type Map as MapLibreMap } from "maplibre-gl";
 import { faIcon } from "./icons.ts";
+import { criticalTier, type CriticalTier } from "./tiers.ts";
 
 export interface PointItem {
   id: string;
@@ -31,7 +32,18 @@ export type EstablishmentsResponse =
 
 export type Notice = "outside-ny" | "nyc" | "empty" | null;
 
+/** What goes inside a marker, plus the stacking class for its MapLibre wrapper. */
+interface MarkerContent {
+  el: HTMLElement;
+  stack?: string;
+}
+
 const plural = (n: number, one: string, many: string) => `${n.toLocaleString()} ${n === 1 ? one : many}`;
+
+// Written out in full so Tailwind's source scanner sees each class name.
+const TIER_SIZE: Record<CriticalTier, string> = { 0: "btn-sm", 1: "btn-sm", 2: "btn-md", 3: "btn-lg" };
+/** Worse places are drawn above better ones where markers overlap. */
+const TIER_STACK: Record<CriticalTier, string> = { 0: "z-0", 1: "z-1", 2: "z-2", 3: "z-3" };
 
 function statusClass(p: { critical: number; noncritical: number }): string {
   if (p.critical > 0) return "btn-error";
@@ -66,7 +78,7 @@ export class MarkerLayer {
   ) {}
 
   update(res: EstablishmentsResponse): void {
-    const next = new Map<string, () => HTMLElement>();
+    const next = new Map<string, () => MarkerContent>();
     const positions = new Map<string, [number, number]>();
 
     if (res.mode === "points") {
@@ -100,8 +112,10 @@ export class MarkerLayer {
       if (this.markers.has(key)) continue;
       // MapLibre positions the marker element with an inline transform; keep the
       // styled button inside a bare wrapper so button styles can't disturb that.
+      const { el, stack } = make();
       const wrapper = document.createElement("div");
-      wrapper.append(make());
+      if (stack) wrapper.className = stack;
+      wrapper.append(el);
       const marker = new Marker({ element: wrapper, anchor: "center" }).setLngLat(positions.get(key)!).addTo(this.map);
       this.markers.set(key, marker);
     }
@@ -112,10 +126,11 @@ export class MarkerLayer {
     this.markers.clear();
   }
 
-  private pointElement(p: { id: string; name: string; critical: number; noncritical: number }): HTMLElement {
+  private pointElement(p: { id: string; name: string; critical: number; noncritical: number }): MarkerContent {
+    const tier = criticalTier(p.critical);
     const btn = document.createElement("button");
     btn.type = "button";
-    btn.className = `btn btn-circle btn-sm shadow-md ring-2 ring-base-100 ${statusClass(p)}`;
+    btn.className = `btn btn-circle ${TIER_SIZE[tier]} shadow-md ring-2 ring-base-100 ${statusClass(p)}`;
     btn.setAttribute("aria-label", pointLabel(p));
     btn.title = p.name;
     btn.append(faIcon("utensils"));
@@ -123,10 +138,21 @@ export class MarkerLayer {
       e.stopPropagation();
       this.onOpen(p.id, p.name);
     });
-    return btn;
+    if (tier < 2) return { el: btn, stack: TIER_STACK[tier] };
+
+    // Two or more critical violations: show the exact count on the marker. The
+    // button's aria-label already says it, so the badge is hidden from screen readers.
+    const badge = document.createElement("span");
+    badge.className = "indicator-item badge badge-xs badge-neutral ring-1 ring-base-100 font-bold";
+    badge.setAttribute("aria-hidden", "true");
+    badge.textContent = String(p.critical);
+    const indicator = document.createElement("span");
+    indicator.className = "indicator";
+    indicator.append(badge, btn);
+    return { el: indicator, stack: TIER_STACK[tier] };
   }
 
-  private clusterElement(c: ClusterItem): HTMLElement {
+  private clusterElement(c: ClusterItem): MarkerContent {
     const btn = document.createElement("button");
     btn.type = "button";
     const size = c.count < 10 ? "btn-sm" : c.count < 100 ? "btn-md" : "btn-lg";
@@ -139,6 +165,6 @@ export class MarkerLayer {
       e.stopPropagation();
       this.map.fitBounds(new LngLatBounds([c.west, c.south], [c.east, c.north]), { padding: 80, maxZoom: 17 });
     });
-    return btn;
+    return { el: btn };
   }
 }

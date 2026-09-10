@@ -33,3 +33,31 @@ test("the stock winter and night themes are the only ones configured", () => {
   const css = files.find((f) => f.name === "styles.css")!.text;
   expect(css).toMatch(/themes:\s*winter --default,\s*night --prefersdark;/);
 });
+
+test("every daisyUI component used in the client is included in the build", () => {
+  // styles.css lists daisyUI modules explicitly to keep the CSS small; a component
+  // used but not listed renders unstyled with no error, so check the two agree.
+  const css = files.find((f) => f.name === "styles.css")!.text;
+  const included = new Set(/include:([^;]*);/.exec(css)![1]!.split(",").map((s) => s.trim()));
+
+  const classTokens = new Set<string>();
+  for (const f of files) {
+    for (const m of f.text.matchAll(/class(?:Name)?\s*[:=]\s*[`"']([^`"']*)[`"']/g)) {
+      for (const t of m[1]!.split(/\s+/)) if (t) classTokens.add(t);
+    }
+  }
+
+  // Module name → the component's main class, where they differ.
+  const mainClass: Record<string, string> = {
+    button: "btn",
+    stat: "stats",
+    fileinput: "file-input",
+    radialprogress: "radial-progress",
+    hover3d: "hover-3d",
+    hovergallery: "hover-gallery",
+    textrotate: "text-rotate",
+  };
+  const modules = readdirSync(join(import.meta.dir, "..", "node_modules", "daisyui", "components")).filter((n) => !n.endsWith(".css"));
+  const missing = modules.filter((mod) => classTokens.has(mainClass[mod] ?? mod) && !included.has(mod));
+  expect(missing).toEqual([]);
+});
