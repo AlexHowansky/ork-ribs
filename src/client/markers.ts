@@ -1,6 +1,5 @@
 import { LngLatBounds, Marker, type Map as MapLibreMap } from "maplibre-gl";
 import { faIcon } from "./icons.ts";
-import { criticalTier, type CriticalTier } from "./tiers.ts";
 
 export interface PointItem {
   id: string;
@@ -40,15 +39,11 @@ interface MarkerContent {
 
 const plural = (n: number, one: string, many: string) => `${n.toLocaleString()} ${n === 1 ? one : many}`;
 
-// Written out in full so Tailwind's source scanner sees each class name.
-const TIER_SIZE: Record<CriticalTier, string> = { 0: "btn-sm", 1: "btn-sm", 2: "btn-md", 3: "btn-lg" };
-/** Worse places are drawn above better ones where markers overlap. */
-const TIER_STACK: Record<CriticalTier, string> = { 0: "z-0", 1: "z-1", 2: "z-2", 3: "z-3" };
-
-function statusClass(p: { critical: number; noncritical: number }): string {
-  if (p.critical > 0) return "btn-error";
-  if (p.noncritical > 0) return "btn-warning";
-  return "btn-success";
+/** The marker's colour, and its stacking class: worse places are drawn above better ones where markers overlap. */
+function status(p: { critical: number; noncritical: number }): { colour: string; stack: string } {
+  if (p.critical > 0) return { colour: "btn-error", stack: "z-2" };
+  if (p.noncritical > 0) return { colour: "btn-warning", stack: "z-1" };
+  return { colour: "btn-success", stack: "z-0" };
 }
 
 function pointLabel(p: { name: string; critical: number; noncritical: number }): string {
@@ -127,15 +122,15 @@ export class MarkerLayer {
   }
 
   private pointElement(p: { id: string; name: string; critical: number; noncritical: number }): MarkerContent {
-    const tier = criticalTier(p.critical);
+    const { colour, stack } = status(p);
     const btn = document.createElement("button");
     btn.type = "button";
-    btn.className = `btn btn-circle ${TIER_SIZE[tier]} shadow-md ring-2 ring-base-100 ${statusClass(p)}`;
+    btn.className = `btn btn-circle btn-sm shadow-md ring-2 ring-base-100 ${colour}`;
     btn.setAttribute("aria-label", pointLabel(p));
     btn.title = p.name;
-    if (tier >= 2) {
-      // Two or more critical violations: the marker shows the count itself. The
-      // aria-label already says it, so the number is hidden from screen readers.
+    if (p.critical > 0) {
+      // A place with critical violations shows how many. The aria-label
+      // already says it, so the number is hidden from screen readers.
       const count = document.createElement("span");
       count.className = "font-bold tabular-nums";
       count.setAttribute("aria-hidden", "true");
@@ -148,7 +143,7 @@ export class MarkerLayer {
       e.stopPropagation();
       this.onOpen(p.id, p.name);
     });
-    return { el: btn, stack: TIER_STACK[tier] };
+    return { el: btn, stack };
   }
 
   private clusterElement(c: ClusterItem): MarkerContent {
