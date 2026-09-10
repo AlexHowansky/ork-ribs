@@ -4,7 +4,18 @@ import { AppError, errorResponse, Errors } from "./errors.ts";
 import { log as rootLog, type Logger } from "./log.ts";
 import { RateLimiter, securityHeaders } from "./security.ts";
 import type { StaticFiles } from "./static.ts";
-import { contains, intersects, NY_BOUNDS, NYC_BOUNDS, parseBBox, parseEstablishmentId, parseZoom, type BBox } from "./validate.ts";
+import {
+  contains,
+  intersects,
+  NY_BOUNDS,
+  NYC_BOUNDS,
+  parseBBox,
+  parseEstablishmentId,
+  parseNear,
+  parseSearchQuery,
+  parseZoom,
+  type BBox,
+} from "./validate.ts";
 
 /** Above this many establishments in view, the server returns grid clusters instead of points. */
 export const POINT_LIMIT = 800;
@@ -56,6 +67,14 @@ export function createApp(opts: AppOptions) {
     }
     const items = store.clustersInBox(bbox, cellSizeFor(zoom));
     return json({ mode: "clusters", total, notice: noticeFor(bbox, total), items }, cache);
+  }
+
+  function search(url: URL): Response {
+    if (store.count() === 0) throw Errors.unavailable();
+    const q = parseSearchQuery(url.searchParams.get("q"));
+    const near = parseNear(url.searchParams.get("lat"), url.searchParams.get("lng"));
+    const items = store.search(q, near);
+    return json({ query: q, total: items.length, sortedBy: near ? "distance" : "name", items }, { "Cache-Control": "public, max-age=300" });
   }
 
   function establishment(id: string): Response {
@@ -141,6 +160,7 @@ export function createApp(opts: AppOptions) {
       if (req.method !== "GET") throw new AppError(405, "method_not_allowed", "That action isn't supported here.");
       if (pathname === "/api/establishments") return establishments(url);
       if (pathname === "/api/meta") return meta();
+      if (pathname === "/api/search") return search(url);
       const m = /^\/api\/establishments\/([^/]+)$/.exec(pathname);
       if (m) return establishment(decodeURIComponent(m[1]!));
       throw Errors.notFound();

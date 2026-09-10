@@ -62,6 +62,12 @@ bun run start
   `/api/establishments?bbox=…&zoom=…`.
   - Up to 800 establishments come back as points. Above that, the server groups them into a grid of
     clusters, which zoom in when selected.
+- **Search.** The header search box finds establishments by name (`/api/search?q=…&lat=…&lng=…`).
+  - **Matching.** Any part of the name, ignoring case and accents, so "cafe" also finds "CAFÉ". Each name is
+    stored lower-cased and accent-free (`search_name`) for matching.
+  - **Order.** Every match is listed, nearest first: nearest to your location if the map found you,
+    otherwise to the centre of the map. The panel says which.
+  - **Choosing a result.** The map moves there and the details open.
 - **Violations.** The dataset stores violations as one text field. It is parsed
   into entries, each with an item code, a critical flag and a description.
   - **Counts.** The state's totals count every instance an inspector recorded, so they can exceed

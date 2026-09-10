@@ -65,6 +65,12 @@ const GEO_MESSAGES: Record<number, string> = {
 };
 
 let userMarker: Marker | null = null;
+let userLocation: { lat: number; lng: number } | null = null;
+
+/** Where the reader is, if they've let us locate them this visit. */
+export function getUserLocation(): { lat: number; lng: number } | null {
+  return userLocation;
+}
 
 /** Centre the map on the reader. Resolves true on success; on failure explains why and leaves the map where it is. */
 export function locateUser(map: MapLibreMap): Promise<boolean> {
@@ -76,6 +82,7 @@ export function locateUser(map: MapLibreMap): Promise<boolean> {
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         const center: [number, number] = [pos.coords.longitude, pos.coords.latitude];
+        userLocation = { lat: pos.coords.latitude, lng: pos.coords.longitude };
         log.info("located user", { accuracyM: Math.round(pos.coords.accuracy) });
         if (!userMarker) {
           const dot = document.createElement("div");

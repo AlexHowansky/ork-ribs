@@ -24,6 +24,16 @@
             <span data-icon="location-crosshairs"></span>
             <span>Locate me</span>
           </button>
+          <form id="search-form" role="search" class="w-full sm:w-auto sm:max-w-md sm:flex-1">
+            <label class="input input-sm w-full">
+              <span data-icon="magnifying-glass" class="opacity-70"></span>
+              <span class="sr-only">Search establishments by name</span>
+              <input id="search-input" type="search" name="q" placeholder="Search by name" autocomplete="off" spellcheck="false" maxlength="100" aria-controls="search-panel" />
+              <button id="search-clear" type="button" class="btn btn-ghost btn-xs btn-circle" aria-label="Clear search" title="Clear search" hidden>
+                <span data-icon="xmark"></span>
+              </button>
+            </label>
+          </form>
         </div>
         <div class="flex flex-wrap items-center gap-x-2 gap-y-2">
           <div id="theme-control" class="join" role="group" aria-label="Colour theme"></div>
@@ -79,6 +89,19 @@
             </ul>
           </div>
         </details>
+
+        <section id="search-panel" class="absolute inset-y-0 left-0 z-20 flex w-full flex-col bg-base-100 shadow-xl sm:w-md" aria-labelledby="search-title" hidden>
+          <header class="flex items-start gap-2 border-b border-base-300 px-4 py-3">
+            <div class="flex-1">
+              <h2 id="search-title" class="font-semibold">Search results</h2>
+              <p id="search-summary" class="text-sm text-base-content/80" role="status" aria-live="polite"></p>
+            </div>
+            <button id="search-close" type="button" class="btn btn-sm btn-circle btn-ghost" aria-label="Close search results" title="Close">
+              <span data-icon="xmark"></span>
+            </button>
+          </header>
+          <ul id="search-results" class="list flex-1 overflow-y-auto" aria-labelledby="search-title"></ul>
+        </section>
 
         <p class="absolute bottom-0 right-0 z-10 max-w-full rounded-tl-box bg-base-100/90 px-2 py-1 text-xs text-base-content/80">
           Map <a class="link" href="https://openfreemap.org" target="_blank" rel="noopener noreferrer">OpenFreeMap</a>

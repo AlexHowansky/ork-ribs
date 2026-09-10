@@ -6,6 +6,7 @@ import { hydrateIcons } from "./icons.ts";
 import { installGlobalErrorLogging, log } from "./log.ts";
 import { createMap, locateUser, setBasemap, viewportQuery } from "./map.ts";
 import { MarkerLayer, type EstablishmentsResponse, type Notice } from "./markers.ts";
+import { mountSearch } from "./search.ts";
 import { effectiveTheme, mountThemeControl, onThemeChange, setPref } from "./theme.ts";
 import { toast } from "./toast.ts";
 
@@ -63,6 +64,7 @@ function setStatus(text: string, loading: boolean): void {
 
 const map = createMap($("map"), effectiveTheme());
 const markers = new MarkerLayer(map, (id, name) => void openDetails(id, name));
+mountSearch({ map, openDetails: (id, name) => void openDetails(id, name) });
 onThemeChange((theme) => setBasemap(map, theme));
 
 let inflight: AbortController | null = null;

@@ -1,6 +1,7 @@
 import { Database } from "bun:sqlite";
 import { mkdirSync } from "node:fs";
 import { dirname } from "node:path";
+import { foldForSearch, haversineKm } from "./search.ts";
 import type { BBox } from "./validate.ts";
 import type { Violation } from "./violations.ts";
 
@@ -47,6 +48,19 @@ export interface ClusterItem {
   withCritical: number;
 }
 
+export interface SearchResult {
+  id: string;
+  name: string;
+  address: string;
+  city: string | null;
+  lat: number;
+  lng: number;
+  critical: number;
+  noncritical: number;
+  /** Kilometres from the reference point, when one was given. */
+  distanceKm: number | null;
+}
+
 export interface NewEstablishment extends EstablishmentRow {
   violations: Violation[];
 }
@@ -55,6 +69,7 @@ const MIGRATIONS: string[] = [
   `CREATE TABLE establishments (
      id TEXT PRIMARY KEY, -- nys_health_operation_id
      name TEXT NOT NULL,
+     search_name TEXT NOT NULL, -- name folded by foldForSearch()
      address TEXT NOT NULL,
      city TEXT,
      zip TEXT,
@@ -145,8 +160,36 @@ export class Store {
       .all({ ...b, cell }) as ClusterItem[];
   }
 
+  /**
+   * Every establishment whose name contains `query` (case- and accent-insensitive),
+   * nearest to `near` first when given, otherwise alphabetical.
+   */
+  search(query: string, near?: { lat: number; lng: number }): SearchResult[] {
+    const q = foldForSearch(query);
+    if (!q) return [];
+    const select = `SELECT id, name, address, city, lat, lng, critical_count AS critical, noncritical_count AS noncritical
+                    FROM establishments WHERE instr(search_name, $q) > 0`;
+    if (!near) {
+      return (this.db.query(`${select} ORDER BY name, id`).all({ q }) as Omit<SearchResult, "distanceKm">[]).map((r) => ({
+        ...r,
+        distanceKm: null,
+      }));
+    }
+    // Matches number in the thousands at most, so sort by true distance here rather than approximating in SQL.
+    const rows = this.db.query(`${select} ORDER BY name, id`).all({ q }) as Omit<SearchResult, "distanceKm">[];
+    return rows
+      .map((r) => ({ ...r, distanceKm: haversineKm(near.lat, near.lng, r.lat, r.lng) }))
+      .sort((a, b) => a.distanceKm - b.distanceKm); // stable, so equal distances stay alphabetical
+  }
+
   getEstablishment(id: string): (EstablishmentRow & { violations: Violation[] }) | null {
-    const row = this.db.query("SELECT * FROM establishments WHERE id = $id").get({ id }) as EstablishmentRow | null;
+    const row = this.db
+      .query(
+        `SELECT id, name, address, city, zip, county, description, inspection_date, critical_count, noncritical_count,
+                crit_not_corrected, comments, lat, lng
+         FROM establishments WHERE id = $id`,
+      )
+      .get({ id }) as EstablishmentRow | null;
     if (!row) return null;
     const violations = (
       this.db
@@ -171,9 +214,9 @@ export class Store {
    */
   replaceAll(rows: NewEstablishment[], meta: Record<string, string>): void {
     const insertEst = this.db.query(
-      `INSERT INTO establishments (id, name, address, city, zip, county, description, inspection_date,
+      `INSERT INTO establishments (id, name, search_name, address, city, zip, county, description, inspection_date,
          critical_count, noncritical_count, crit_not_corrected, comments, lat, lng)
-       VALUES ($id, $name, $address, $city, $zip, $county, $description, $inspection_date,
+       VALUES ($id, $name, $search_name, $address, $city, $zip, $county, $description, $inspection_date,
          $critical_count, $noncritical_count, $crit_not_corrected, $comments, $lat, $lng)`,
     );
     const insertViolation = this.db.query(
@@ -182,7 +225,7 @@ export class Store {
     this.db.transaction(() => {
       this.db.exec("DELETE FROM violations; DELETE FROM establishments;");
       for (const { violations, ...row } of rows) {
-        insertEst.run(row);
+        insertEst.run({ ...row, search_name: foldForSearch(row.name) });
         violations.forEach((v, seq) =>
           insertViolation.run({ id: row.id, seq, code: v.code, critical: v.critical ? 1 : 0, description: v.description }),
         );
