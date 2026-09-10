@@ -68,6 +68,18 @@ bun run start
   - **Order.** Every match is listed, nearest first: nearest to your location if the map found you,
     otherwise to the centre of the map. The panel says which.
   - **Choosing a result.** The map moves there and the details open.
+- **Inspection history.** The details modal has two tabs: *Violation details* (shown first) and
+  *Inspection history*. Opening the history tab asks `/api/establishments/:id/history`, once per
+  opening of the modal; a failed request can be retried. The history isn't part of the local copy.
+  - **Source.** The server asks the state's
+    [Food Service Establishment Inspections: Beginning 2005](https://health.data.ny.gov/Health/Food-Service-Establishment-Inspections-Beginning-2/2hcc-shji)
+    dataset (`2hcc-shji`) for that one `nys_health_operation_id`, grouped by inspection date. The browser
+    never calls the state's API directly, so the CSP stays `'self'`.
+  - **Safety and caching.** Only ids already in the local copy are looked up. Answers are cached in memory
+    for an hour, and requests for the same id that arrive together share one upstream call.
+  - **Display.** The modal plots critical and non-critical totals over time with Chart.js, and offers the
+    same figures as a table. The chart's colours are read from the active daisyUI theme, and it redraws when
+    the theme changes. If the state's service is down, the rest of the modal still works.
 - **Violations.** The dataset stores violations as one text field. It is parsed
   into entries, each with an item code, a critical flag and a description.
   - **Counts.** The state's totals count every instance an inspector recorded, so they can exceed

@@ -4,6 +4,7 @@ import { createApp } from "./app.ts";
 import { buildClient, DIST } from "./build.ts";
 import { config } from "./config.ts";
 import { Store } from "./db.ts";
+import { createHistorySource } from "./history.ts";
 import { log, setLogLevel } from "./log.ts";
 import { StaticFiles } from "./static.ts";
 import { scheduleSync } from "./sync.ts";
@@ -37,7 +38,13 @@ const server = Bun.serve({
   port: config.port,
   hostname: config.host,
   maxRequestBodySize: 64 * 1024,
-  fetch: createApp({ store, staticFiles, production: config.production, rateLimitPerMinute: config.rateLimitPerMinute }),
+  fetch: createApp({
+    store,
+    staticFiles,
+    production: config.production,
+    rateLimitPerMinute: config.rateLimitPerMinute,
+    history: createHistorySource({ appToken: config.socrataAppToken }),
+  }),
   error(err) {
     log.error("server error", { err });
     return Response.json(

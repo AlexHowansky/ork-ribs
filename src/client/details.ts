@@ -1,7 +1,9 @@
 import { FriendlyError, getJson, isAbort } from "./api.ts";
 import { h } from "./dom.ts";
+import { destroyHistoryChart, historyPanel } from "./history.ts";
 import { faIcon } from "./icons.ts";
 import { log } from "./log.ts";
+import { tabs } from "./tabs.ts";
 
 export interface EstablishmentDetails {
   id: string;
@@ -48,7 +50,7 @@ function stat(title: string, value: number, desc: string | null, tone: keyof typ
   );
 }
 
-function render(d: EstablishmentDetails): HTMLElement {
+function render(d: EstablishmentDetails, signal: AbortSignal): HTMLElement {
   const listedCritical = d.violations.filter((v) => v.critical).length;
   const listedNon = d.violations.length - listedCritical;
   const countsDiffer = listedCritical !== d.critical || listedNon !== d.noncritical;
@@ -117,11 +119,9 @@ function render(d: EstablishmentDetails): HTMLElement {
     );
   }
 
-  return h(
+  const details = h(
     "div",
     { class: "flex flex-col gap-5" },
-    header,
-    stats,
     h(
       "section",
       { class: "flex flex-col gap-3", "aria-labelledby": "violations-title" },
@@ -143,6 +143,26 @@ function render(d: EstablishmentDetails): HTMLElement {
           h("ul", { class: "list-disc pl-5 text-sm text-base-content/80" }, ...d.comments.map((c) => h("li", {}, c))),
         )
       : null,
+  );
+
+  // The history comes from the state's service rather than our copy, so it is only fetched once its tab is opened.
+  const history = historyPanel(d.id, signal);
+
+  return h(
+    "div",
+    { class: "flex flex-col gap-5" },
+    header,
+    stats,
+    tabs(
+      "Inspection information",
+      [
+        { id: "details-violations", label: "Violation details", panel: details },
+        { id: "details-history", label: "Inspection history", panel: history.panel },
+      ],
+      (tab) => {
+        if (tab === "details-history") history.activate();
+      },
+    ),
   );
 }
 
@@ -167,13 +187,21 @@ export async function openDetails(id: string, name: string): Promise<void> {
   const ctrl = new AbortController();
   inflight = ctrl;
 
+  destroyHistoryChart();
   content.replaceChildren(skeleton(name));
   if (!dialog.open) dialog.showModal();
-  dialog.addEventListener("close", () => ctrl.abort(), { once: true });
+  dialog.addEventListener(
+    "close",
+    () => {
+      ctrl.abort();
+      destroyHistoryChart();
+    },
+    { once: true },
+  );
 
   try {
     const details = await getJson<EstablishmentDetails>(`/api/establishments/${encodeURIComponent(id)}`, { signal: ctrl.signal });
-    content.replaceChildren(render(details));
+    content.replaceChildren(render(details, ctrl.signal));
     log.debug("details shown", { id });
   } catch (err) {
     if (isAbort(err)) return;

@@ -1,6 +1,7 @@
 import type { Server } from "bun";
 import type { Store } from "./db.ts";
 import { AppError, errorResponse, Errors } from "./errors.ts";
+import { createHistorySource, type HistorySource } from "./history.ts";
 import { log as rootLog, type Logger } from "./log.ts";
 import { RateLimiter, securityHeaders } from "./security.ts";
 import type { StaticFiles } from "./static.ts";
@@ -27,6 +28,8 @@ export interface AppOptions {
   production?: boolean;
   rateLimitPerMinute?: number;
   logger?: Logger;
+  /** Where inspection histories come from; defaults to the NYS open data service. */
+  history?: HistorySource;
 }
 
 export type Notice = "outside-ny" | "nyc" | "empty" | null;
@@ -51,6 +54,7 @@ export function createApp(opts: AppOptions) {
   const logger = (opts.logger ?? rootLog).child({ component: "http" });
   const baseHeaders = securityHeaders(opts.production ?? false);
   const limiter = new RateLimiter(60, opts.rateLimitPerMinute ?? 240);
+  const history = opts.history ?? createHistorySource({ logger: opts.logger });
 
   function json(body: unknown, extra: Record<string, string> = {}, status = 200): Response {
     return Response.json(body, { status, headers: { ...baseHeaders, ...extra } });
@@ -103,6 +107,13 @@ export function createApp(opts: AppOptions) {
       },
       { "Cache-Control": "public, max-age=300" },
     );
+  }
+
+  async function establishmentHistory(id: string): Promise<Response> {
+    const known = store.getEstablishment(parseEstablishmentId(id));
+    if (!known) throw Errors.notFound("We couldn't find that establishment. It may have been removed from the state's records.");
+    const items = await history(known.id);
+    return json({ id: known.id, inspections: items }, { "Cache-Control": "public, max-age=3600" });
   }
 
   function meta(): Response {
@@ -163,6 +174,8 @@ export function createApp(opts: AppOptions) {
       if (pathname === "/api/search") return search(url);
       const m = /^\/api\/establishments\/([^/]+)$/.exec(pathname);
       if (m) return establishment(decodeURIComponent(m[1]!));
+      const hm = /^\/api\/establishments\/([^/]+)\/history$/.exec(pathname);
+      if (hm) return establishmentHistory(decodeURIComponent(hm[1]!));
       throw Errors.notFound();
     }
 
