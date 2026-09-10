@@ -68,7 +68,7 @@ function render(d: EstablishmentDetails): HTMLElement {
 
   const stats = h(
     "div",
-    { class: "stats stats-vertical w-full bg-base-200 md:stats-horizontal" },
+    { class: "stats stats-vertical w-full bg-base-200 2xl:stats-horizontal" },
     h(
       "div",
       { class: "stat" },
@@ -95,7 +95,7 @@ function render(d: EstablishmentDetails): HTMLElement {
   } else {
     violations = h(
       "ul",
-      { class: "grid gap-3 lg:grid-cols-2 2xl:grid-cols-3" },
+      { class: "grid gap-3 2xl:grid-cols-2" },
       ...d.violations.map((v) =>
         h(
           "li",
