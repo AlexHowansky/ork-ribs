@@ -133,23 +133,22 @@ export class MarkerLayer {
     btn.className = `btn btn-circle ${TIER_SIZE[tier]} shadow-md ring-2 ring-base-100 ${statusClass(p)}`;
     btn.setAttribute("aria-label", pointLabel(p));
     btn.title = p.name;
-    btn.append(faIcon("utensils"));
+    if (tier >= 2) {
+      // Two or more critical violations: the marker shows the count itself. The
+      // aria-label already says it, so the number is hidden from screen readers.
+      const count = document.createElement("span");
+      count.className = "font-bold tabular-nums";
+      count.setAttribute("aria-hidden", "true");
+      count.textContent = String(p.critical);
+      btn.append(count);
+    } else {
+      btn.append(faIcon("utensils"));
+    }
     btn.addEventListener("click", (e) => {
       e.stopPropagation();
       this.onOpen(p.id, p.name);
     });
-    if (tier < 2) return { el: btn, stack: TIER_STACK[tier] };
-
-    // Two or more critical violations: show the exact count on the marker. The
-    // button's aria-label already says it, so the badge is hidden from screen readers.
-    const badge = document.createElement("span");
-    badge.className = "indicator-item badge badge-xs badge-neutral ring-1 ring-base-100 font-bold";
-    badge.setAttribute("aria-hidden", "true");
-    badge.textContent = String(p.critical);
-    const indicator = document.createElement("span");
-    indicator.className = "indicator";
-    indicator.append(badge, btn);
-    return { el: indicator, stack: TIER_STACK[tier] };
+    return { el: btn, stack: TIER_STACK[tier] };
   }
 
   private clusterElement(c: ClusterItem): MarkerContent {

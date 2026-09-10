@@ -5,7 +5,7 @@
   themes: winter --default, night --prefersdark;
   /* Only the components this app uses (plus base and utility modules); the rest would add ~500 KB. */
   include: properties, rootcolor, rootscrolllock, rootscrollgutter, scrollbar, svg, radius, join, typography,
-    alert, badge, button, indicator, input, link, list, loading, modal, navbar, skeleton, stat, toast;
+    alert, badge, button, input, link, list, loading, modal, navbar, skeleton, stat, toast;
 }
 
 /* Font Awesome inline SVGs (its own stylesheet is not loaded; this is the only rule we need). */
