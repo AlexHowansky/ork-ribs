@@ -1,4 +1,4 @@
-# ORK Restaurant Guide
+# RIBS — Restaurant Inspection and Business Search
 
 A full-screen map of New York State food service establishments with their most
 recent health inspection. The map opens where you are, or on the whole state if
@@ -37,7 +37,7 @@ bun run start
 | Variable                | Default           | Meaning                                                            |
 | ----------------------- | ----------------- | ------------------------------------------------------------------ |
 | `PORT` / `HOST`         | `3000` / `127.0.0.1` | Where the server listens                                        |
-| `DB_PATH`               | `data/ork.sqlite` | SQLite database file                                               |
+| `DB_PATH`               | `data/ribs.sqlite` | SQLite database file                                              |
 | `LOG_LEVEL`             | `info`            | `debug`, `info`, `warn` or `error`                                 |
 | `SYNC_INTERVAL_HOURS`   | `24`              | How often to check the state's data for updates                    |
 | `SOCRATA_APP_TOKEN`     | —                 | Optional [app token](https://dev.socrata.com/docs/app-tokens.html) for higher API limits |

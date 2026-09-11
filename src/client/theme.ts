@@ -6,7 +6,7 @@ export type ThemePref = "light" | "dark" | "system";
 /** The daisyUI theme actually in effect. */
 export type ThemeName = "winter" | "night";
 
-const STORAGE_KEY = "ork-theme"; // also read by public/theme-init.js before first paint
+const STORAGE_KEY = "ribs-theme"; // also read by public/theme-init.js before first paint
 const THEME_FOR: Record<Exclude<ThemePref, "system">, ThemeName> = { light: "winter", dark: "night" };
 const darkQuery = window.matchMedia("(prefers-color-scheme: dark)");
 const listeners = new Set<(theme: ThemeName) => void>();

@@ -18,7 +18,7 @@ const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as 
 
 // The legend remembers whether the reader folded it away. With no saved choice
 // it starts open, except on narrow screens where it would cover the map.
-const LEGEND_KEY = "ork-legend";
+const LEGEND_KEY = "ribs-legend";
 const legend = $<HTMLDetailsElement>("legend");
 const legendOpenByDefault = () => !window.matchMedia("(max-width: 640px)").matches;
 function applyLegendDefault(): void {

@@ -19,7 +19,7 @@ function levelFromEnv(): LogLevel {
 export const config = {
   port: intFromEnv("PORT", 3000, 1, 65535),
   host: process.env.HOST ?? "127.0.0.1",
-  dbPath: process.env.DB_PATH ?? "data/ork.sqlite",
+  dbPath: process.env.DB_PATH ?? "data/ribs.sqlite",
   logLevel: levelFromEnv(),
   production: process.env.NODE_ENV === "production",
   socrataAppToken: process.env.SOCRATA_APP_TOKEN || undefined,

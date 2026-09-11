@@ -43,7 +43,7 @@ function write(level: Level, msg: string, ctx?: Ctx): void {
   const plain = toPlain(ctx);
   const line = { ts: new Date().toISOString(), level, msg, ...plain };
   const method = level === "debug" ? "debug" : level === "info" ? "info" : level;
-  console[method]("[ork]", line);
+  console[method]("[ribs]", line);
   if (level === "warn" || level === "error") report(level, msg, plain);
 }
 
