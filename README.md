@@ -34,6 +34,9 @@ bun run start
 
 ### Configuration
 
+Set these as environment variables, or copy `.env.example` to `.env` and uncomment the ones you want
+to change (Bun loads `.env` automatically).
+
 | Variable                | Default           | Meaning                                                            |
 | ----------------------- | ----------------- | ------------------------------------------------------------------ |
 | `PORT` / `HOST`         | `3000` / `127.0.0.1` | Where the server listens                                        |
