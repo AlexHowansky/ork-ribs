@@ -8,7 +8,7 @@
         "@fortawesome/fontawesome-svg-core": "^7.3.1",
         "@fortawesome/free-solid-svg-icons": "^7.3.1",
         "chart.js": "^4.5.1",
-        "maplibre-gl": "^6.12.0",
+        "maplibre-gl": "^6.14.0",
       },
       "devDependencies": {
         "@types/bun": "^1.4.2",
@@ -32,7 +32,7 @@
 
     "@mapbox/point-geometry": ["@mapbox/point-geometry@1.1.0", "", {}, "sha512-YGcBz1cg4ATXDCM/71L9xveh4dynfGmcLDqufR+nQQy3fKwsAZsWd/x4621/6uJaeB9mwOHE6hPeDgXz9uViUQ=="],
 
-    "@mapbox/tiny-sdf": ["@mapbox/tiny-sdf@2.2.0", "", {}, "sha512-LVL4wgI9YAum5V+LNVQO6QgFBPw7/MIIY4XJPNsPDMrjEwcE+JfKk1LuIl8GnF197ejVdC9QdPaxrx5gfgdGXg=="],
+    "@mapbox/tiny-sdf": ["@mapbox/tiny-sdf@2.3.0", "", {}, "sha512-gBvcNDBBB66bgQYvnaJ6Jk+VCaMmVq5+IZR2kWPisT88Z8s0kBQt6hfVi8QgRW8Vpg0UWZzBA4ZSyzHHC+VeRA=="],
 
     "@mapbox/unitbezier": ["@mapbox/unitbezier@1.0.0", "", {}, "sha512-fqd515fjBmANKGGsQ286E2Wvj/XvDFpGzwJxq4CI6jMQue6Oy04uCKp+JWKF00xRTmk6cEu1jPJ9p3xqH8YWqQ=="],
 
@@ -46,35 +46,35 @@
 
     "@maplibre/vt-pbf": ["@maplibre/vt-pbf@4.3.2", "", { "dependencies": { "@mapbox/point-geometry": "^1.1.0", "@types/geojson": "^7946.0.16", "pbf": "^5.1.0" } }, "sha512-j6p0AdjvAR19Z3XaCysle7A4ZSo08tYOzxD0Y9NQylwPAkwJJeYub5b2eVucdeDh7erhv69DahoLOevDRERRUw=="],
 
-    "@oven/bun-darwin-aarch64": ["@oven/bun-darwin-aarch64@1.4.2", "", { "os": "darwin", "cpu": "arm64" }, "sha512-MXdZkP1featqxZ+/VTXWG1BVjM4OGBehVY2Q88EeUj/7L0UMeCGItmyPYTN+wxvlGJ6F66JEtzsw+GvQWewnag=="],
+    "@oven/bun-darwin-aarch64": ["@oven/bun-darwin-aarch64@1.4.3", "", { "os": "darwin", "cpu": "arm64" }, "sha512-u2wAM9RzqyF4baO5oFVhcFUVWO1CCMLG6yC5/aPWCYGZPfL5ULMbeHt+0/3I0h3yaPx1m+PKSANO/61jPtDZcQ=="],
 
-    "@oven/bun-darwin-x64": ["@oven/bun-darwin-x64@1.4.2", "", { "os": "darwin", "cpu": "x64" }, "sha512-gZTxZuLjkUhAWjTETu3tw0WhsEdNkJ64daj60ybhPf835a2yollV3yTkK9JozvzKPx4TRFzLSl8C+U525pxVbw=="],
+    "@oven/bun-darwin-x64": ["@oven/bun-darwin-x64@1.4.3", "", { "os": "darwin", "cpu": "x64" }, "sha512-wRGeciWOyKyG/BfTHq4CAyqoOfuzj5UJkKA8FlJETW2yhtDh+Ba3EgPnsVclFyzIw7E0HJxpsonoj17g3HPK/Q=="],
 
-    "@oven/bun-freebsd-aarch64": ["@oven/bun-freebsd-aarch64@1.4.2", "", { "os": "freebsd", "cpu": "arm64" }, "sha512-SMNItMw1Z8QeeQVKnw8jA7xQNkeXdP+OPgin4Wi/QTx/B8RHHLnuZfqmFy7NtVeT2NF0kKYppW4WWd2CCYZjhQ=="],
+    "@oven/bun-freebsd-aarch64": ["@oven/bun-freebsd-aarch64@1.4.3", "", { "os": "freebsd", "cpu": "arm64" }, "sha512-z4LiDRPTJMKA8JvtP+Z+I5m1syJr8HGYFainIJoCAdkWaHMyQMaEEYr0N+FzTK4pECUHUmscCTNfC9XJwTe4dQ=="],
 
-    "@oven/bun-freebsd-x64": ["@oven/bun-freebsd-x64@1.4.2", "", { "os": "freebsd", "cpu": "x64" }, "sha512-THbPKXhO54N0DpFRKZNDZpQ7dpbX0bWASuARckAUS9wRtFIHsiY+uULXJvxJGo2YD1YewvXQ4G8Fj7XT5oBCiw=="],
+    "@oven/bun-freebsd-x64": ["@oven/bun-freebsd-x64@1.4.3", "", { "os": "freebsd", "cpu": "x64" }, "sha512-YpwGnfvtSMRMnnViJI5wCGmS5HpCBAl0wLhBflJfmZYkgOHfplzeKUkUVDW2bNOZyrym3YN+EDaLWooaJpX8Eg=="],
 
-    "@oven/bun-linux-aarch64": ["@oven/bun-linux-aarch64@1.4.2", "", { "os": "linux", "cpu": "arm64" }, "sha512-3BBP9ovJ2RGHFH6Ae1CAtxNtG1+YY6GD6rmYbsUosoAk9+OEl6zeDQ/k4fBkc6dYOJCtWnx8hUxzNzQATSmvYQ=="],
+    "@oven/bun-linux-aarch64": ["@oven/bun-linux-aarch64@1.4.3", "", { "os": "linux", "cpu": "arm64" }, "sha512-ylogDFxDD+aRKO0TJauwDzCWM+rULvc85gRNZQ9CnY6rm2BU4GC2XUDi20bh67CIuB4Wt/0PL1xpsJ2hqplMww=="],
 
-    "@oven/bun-linux-aarch64-android": ["@oven/bun-linux-aarch64-android@1.4.2", "", { "os": "android", "cpu": "arm64" }, "sha512-3mZKO2rhsNgbAUtAHC1UKUlF2zTxFraDZT/Elv8wzyH0fJL9h+Iv3TgB9lO63w89PRn3eFe+NRA1bhVgikKNPQ=="],
+    "@oven/bun-linux-aarch64-android": ["@oven/bun-linux-aarch64-android@1.4.3", "", { "os": "android", "cpu": "arm64" }, "sha512-KCsYD+HHawd6xht4BOffTnLZXNf+xzq8l52MsIF2yRtIfUvGTCumdnJPXxuo969iXukb7cWtz+WMkpYlKMG+sg=="],
 
-    "@oven/bun-linux-aarch64-musl": ["@oven/bun-linux-aarch64-musl@1.4.2", "", { "os": "linux", "cpu": "arm64" }, "sha512-+Sm6y+lSiSFBOtXmnekp5Q6n1tUKlyv71FCPWBc61Cgb14T5eBs8SN/nh4MUCOKzONkI3O+as3MGUgikS4aCBQ=="],
+    "@oven/bun-linux-aarch64-musl": ["@oven/bun-linux-aarch64-musl@1.4.3", "", { "os": "linux", "cpu": "arm64" }, "sha512-5OJIbcVspZxIN/zQtrFYwLuJgaOlciGcynmwCtwKyg0rmXHJoNG0QyspiiLnDUDoVTSGY/nrn0QEbWKhu0QbEQ=="],
 
-    "@oven/bun-linux-x64": ["@oven/bun-linux-x64@1.4.2", "", { "os": "linux", "cpu": "x64" }, "sha512-9/E/UXOTpSo3YsV5g+FhtTd/qTpiWoKuxS12cqtuYA1ssu9fRAoPQnipFgGyck3tWO63iUdxBiygq+kELFawng=="],
+    "@oven/bun-linux-x64": ["@oven/bun-linux-x64@1.4.3", "", { "os": "linux", "cpu": "x64" }, "sha512-RArgnpjeXjaGzjp5h7Rs89cUYJutO8IyqR3itE8OBaBzEt8KNm2jp/YozxBHq4eFovwrQLryeSwTAcmiT+zcoA=="],
 
-    "@oven/bun-linux-x64-android": ["@oven/bun-linux-x64-android@1.4.2", "", { "os": "android", "cpu": "x64" }, "sha512-6HC5tzcC79113n2IHCTJMWv+HsQImv4ZFEK2XpYLxY6HbT8tM4cUM2Zv1bHZBQsS3jv/zYBamDJ1UX7If0d5tw=="],
+    "@oven/bun-linux-x64-android": ["@oven/bun-linux-x64-android@1.4.3", "", { "os": "android", "cpu": "x64" }, "sha512-5CdcvAc+iTqf/p6S0VkoGF8harKMjTfEkMOXJHslwBzl5GcY5alth1mkhD3T7SqLA5aUal95vzfiNjoAZXkPOw=="],
 
-    "@oven/bun-linux-x64-musl": ["@oven/bun-linux-x64-musl@1.4.2", "", { "os": "linux", "cpu": "x64" }, "sha512-vVTKUg1bnPhRP/Hp73jIVoFh2vPFNYEqYX0ERKfZBOQEEHitNAeukZzzuUDZS0SoDCIpuWUGSpd/CDMbjdR+Uw=="],
+    "@oven/bun-linux-x64-musl": ["@oven/bun-linux-x64-musl@1.4.3", "", { "os": "linux", "cpu": "x64" }, "sha512-L0gTTjTncLqv7VsV/2iLz7Zk4vd969xqRgbtGnskmV3MvL+IJgzTyQr5zm8GGGWSm/SO/ab2vnn4GXgPomoGbg=="],
 
-    "@oven/bun-windows-aarch64": ["@oven/bun-windows-aarch64@1.4.2", "", { "os": "win32", "cpu": "arm64" }, "sha512-8EJ1ST7339WJE3poPW5nBgVW/lWf9HBz4W27ZUNhburKmcBLOByPyE6DP9fHD8FQGm5c+ilUN2hX1mrW0jxq9Q=="],
+    "@oven/bun-windows-aarch64": ["@oven/bun-windows-aarch64@1.4.3", "", { "os": "win32", "cpu": "arm64" }, "sha512-a3Vyu9KI0J9vfIS+/LJMmjWI/qsBpph8u0R7d6Tm+YaSOqZeN2LRULfVqz13dgQRTvqg6aWBxOv9jE4Rl0lAAQ=="],
 
-    "@oven/bun-windows-x64": ["@oven/bun-windows-x64@1.4.2", "", { "os": "win32", "cpu": "x64" }, "sha512-+bN6OuVld/9diT/RLSXSW7JE6CvNE3gL9XsAEjULi1nUsXd6DNO6GuA9jNdNb3r8PdJFnYHr5aypNV1Oj3Rd9g=="],
+    "@oven/bun-windows-x64": ["@oven/bun-windows-x64@1.4.3", "", { "os": "win32", "cpu": "x64" }, "sha512-9pV16qXHTFvZDH61S8hpdpVBbWmvEqekczLF54zTnQHKP28D6yRCNLrD/7jVbXYR61fQYAx4FSBgzCxGCKb3rQ=="],
 
     "@types/bun": ["@types/bun@1.4.2", "", { "dependencies": { "bun-types": "1.4.2" } }, "sha512-GimotNn7+ZV0uVArItBbriZsR1oNf0+WTzPkdcFrzShI7k2norL0uzEaJT8T33dWr7O/c9ZDuAFQrctKCi72oQ=="],
 
     "@types/geojson": ["@types/geojson@7946.0.16", "", {}, "sha512-6C8nqWur3j98U6+lXDfTUWIfgvZU+EumvpHKcYjujKH7woYyLj2sUmff0tRhrqM7BohUw7Pz3ZB1jj2gW9Fvmg=="],
 
-    "@types/node": ["@types/node@26.6.4", "", { "dependencies": { "undici-types": "~8.9.0" } }, "sha512-ldVPDCzj7fsaGZrLB0NuHuTvJcsNasysBAqMolr/cgxrLd1xbqxIr3XJiPnHHJUCxj5sNF1vnRj9aWnrVh5Jcg=="],
+    "@types/node": ["@types/node@26.6.5", "", { "dependencies": { "undici-types": "~8.9.0" } }, "sha512-uMzsv9stDdofIZBx4UGh4Z9ZgXnGC9seRDscilBcTHAeOFk67MZg/k9bWVfO+bk4qZmG+l52hRnLwUiH2LnJTg=="],
 
     "@typescript/typescript-aix-ppc64": ["@typescript/typescript-aix-ppc64@7.0.2", "", { "os": "aix", "cpu": "ppc64" }, "sha512-MTKKkWB7p/0E9xi1d1tHtZ5PiLkGEMIq88pK2CubZjOsLtYTLqhgIgi6zepFa+9GHZ6h05NMCkQxGKiPXMxXtQ=="],
 
@@ -118,7 +118,7 @@
 
     "bidi-js": ["bidi-js@1.1.0", "", { "dependencies": { "require-from-string": "^2.0.2" } }, "sha512-fX1Onk0tdVPC7obPWB5EbJ1z7NVhLq4m2xZLq2YXBkxzMXIGRpNMU88n0EPgWseKl12J7zXs7qrDxPK4sRs2fg=="],
 
-    "bun": ["bun@1.4.2", "", { "optionalDependencies": { "@oven/bun-darwin-aarch64": "1.4.2", "@oven/bun-darwin-x64": "1.4.2", "@oven/bun-freebsd-aarch64": "1.4.2", "@oven/bun-freebsd-x64": "1.4.2", "@oven/bun-linux-aarch64": "1.4.2", "@oven/bun-linux-aarch64-android": "1.4.2", "@oven/bun-linux-aarch64-musl": "1.4.2", "@oven/bun-linux-x64": "1.4.2", "@oven/bun-linux-x64-android": "1.4.2", "@oven/bun-linux-x64-musl": "1.4.2", "@oven/bun-windows-aarch64": "1.4.2", "@oven/bun-windows-x64": "1.4.2" }, "os": [ "!aix", "!sunos", "!openbsd", ], "cpu": [ "x64", "arm64", ], "bin": { "bun": "bin/bun.exe", "bunx": "bin/bunx.exe" } }, "sha512-TrSXo6HJfIEaczpb3kjX82I2pL47vK1QUNmHRCUdz9IzaOwa9lzOXSWwu2l18YHE3sNfGRapVLd4nNm+22vVVA=="],
+    "bun": ["bun@1.4.3", "", { "optionalDependencies": { "@oven/bun-darwin-aarch64": "1.4.3", "@oven/bun-darwin-x64": "1.4.3", "@oven/bun-freebsd-aarch64": "1.4.3", "@oven/bun-freebsd-x64": "1.4.3", "@oven/bun-linux-aarch64": "1.4.3", "@oven/bun-linux-aarch64-android": "1.4.3", "@oven/bun-linux-aarch64-musl": "1.4.3", "@oven/bun-linux-x64": "1.4.3", "@oven/bun-linux-x64-android": "1.4.3", "@oven/bun-linux-x64-musl": "1.4.3", "@oven/bun-windows-aarch64": "1.4.3", "@oven/bun-windows-x64": "1.4.3" }, "os": [ "!aix", "!sunos", "!openbsd", ], "cpu": [ "x64", "arm64", ], "bin": { "bun": "bin/bun.exe", "bunx": "bin/bunx.exe" } }, "sha512-EvQQ2dUJlixjKgJjeXZvdsHUWIKnVfYufrQNDHa++0YM4XksQ4GtGofEdRnQSiyNp/yUWiX6SlqS8zugZCo+2A=="],
 
     "bun-plugin-tailwind": ["bun-plugin-tailwind@0.1.2", "", { "peerDependencies": { "bun": ">=1.0.0" } }, "sha512-41jNC1tZRSK3s1o7pTNrLuQG8kL/0vR/JgiTmZAJ1eHwe0w5j6HFPKeqEk0WAD13jfrUC7+ULuewFBBCoADPpg=="],
 
@@ -136,7 +136,7 @@
 
     "kdbush": ["kdbush@4.1.0", "", {}, "sha512-e9vurzrXJQrFX6ckpHP3bvj5l+9CnYzkxDNnNQ1h2QTqdWsUAJgXiKdGNcOa1EY85dU8KbQ+z/FdQdB7P+9yfQ=="],
 
-    "maplibre-gl": ["maplibre-gl@6.12.0", "", { "dependencies": { "@mapbox/point-geometry": "^1.1.0", "@mapbox/tiny-sdf": "^2.2.0", "@mapbox/unitbezier": "^1.0.0", "@mapbox/vector-tile": "^3.0.0", "@maplibre/geojson-vt": "^6.1.1", "@maplibre/maplibre-gl-style-spec": "^26.4.4", "@maplibre/mlt": "^1.3.0", "@maplibre/vt-pbf": "^4.3.2", "@types/geojson": "^7946.0.16", "bidi-js": "^1.1.0", "earcut": "^3.2.4", "gl-matrix": "^3.4.4", "kdbush": "^4.1.0", "murmurhash-js": "^1.0.0", "pbf": "^5.1.2", "potpack": "^2.1.0", "quickselect": "^3.0.0", "tinyqueue": "^3.0.0" } }, "sha512-DwgganVi2BhNxOpD7ob3lJC0dQQz4HfJfuQQV3XxCY3XdOzFrMqp9ylMXhRzryRsOnIezdZcklWXIIs/Q8JPjA=="],
+    "maplibre-gl": ["maplibre-gl@6.14.0", "", { "dependencies": { "@mapbox/point-geometry": "^1.1.0", "@mapbox/tiny-sdf": "^2.2.0", "@mapbox/unitbezier": "^1.0.0", "@mapbox/vector-tile": "^3.0.0", "@maplibre/geojson-vt": "^6.1.2", "@maplibre/maplibre-gl-style-spec": "^26.4.4", "@maplibre/mlt": "^1.3.0", "@maplibre/vt-pbf": "^4.3.2", "@types/geojson": "^7946.0.16", "bidi-js": "^1.1.0", "earcut": "^3.2.4", "gl-matrix": "^3.4.4", "kdbush": "^4.1.0", "murmurhash-js": "^1.0.0", "pbf": "^5.1.2", "potpack": "^2.1.0", "quickselect": "^3.0.0", "tinyqueue": "^3.0.0" } }, "sha512-L7U9y9TyPJ3P/JJbW+eH+A3FzdPq+3fnZFqqeCwf/S6cRGganHwVI5b/C8/zOYzreUzsloDPZVVaMQA94wOt4A=="],
 
     "minimist": ["minimist@1.2.8", "", {}, "sha512-2yyAR8qBkN3YuheJanUpWC5U3bb5osDywNB8RzDVlDwDHbocAJveqqj1u8+SVD7jkWT4yvsHCpWqqWqAxb0zCA=="],
 
