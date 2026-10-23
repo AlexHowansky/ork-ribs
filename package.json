@@ -14,13 +14,13 @@
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^7.3.1",
     "@fortawesome/free-solid-svg-icons": "^7.3.1",
-    "chart.js": "^4.5.1",
-    "maplibre-gl": "^6.14.0"
+    "chart.js": "^4.6.1",
+    "maplibre-gl": "^6.15.0"
   },
   "devDependencies": {
-    "@types/bun": "^1.4.2",
+    "@types/bun": "^1.4.4",
     "bun-plugin-tailwind": "^0.1.2",
-    "daisyui": "^5.7.47",
+    "daisyui": "^5.7.50",
     "tailwindcss": "^4.3.3",
     "typescript": "^7.0.2"
   }
